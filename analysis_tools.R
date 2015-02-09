@@ -7,7 +7,7 @@ hex_plot <- function(x1, y1=NULL){
 
 
 #assume x and y are indexed the same
-mean_plot <- function (x, y){
+mean_plot <- function (x, y, yrange=c(0,0)){
   x_level <- c()
   mean_y <- c()
   freq <- as.data.frame(table(x))$Freq
@@ -15,9 +15,16 @@ mean_plot <- function (x, y){
     x_level <- c(x_level, as.numeric(x_val))
     mean_y <- c(mean_y, mean( y[which(x==x_val)] ))
   }
-  plot(x_level, mean_y)
-  symbols(x=x_level, y=mean_y, circles=sqrt(freq/pi), 
-          inches=1/3, ann=F, bg="steelblue2", fg=NULL)
+  
+  #hack to check if yrange has been passed in
+  if(yrange[1] == yrange[2]){
+    symbols(x=x_level, y=mean_y, circles=sqrt(freq/pi), 
+            inches=1/3, ann=F, bg="steelblue2", fg=NULL)
+  }else{
+    symbols(x=x_level, y=mean_y, circles=sqrt(freq/pi), 
+            inches=1/3, ann=F, bg="steelblue2", fg=NULL, ylim=yrange)
+  }
+  
   cor(mean_y, x_level)
 }
 
@@ -40,27 +47,20 @@ mean_density_plot <- function(x, y){
   par(mfrow=c(1,1))
 }
 
-#Old code
+##################
+#Get PRESS, predictive R^2
+# Seems to not work with glm, figure out why
+press <- function(model){
+  #predictive R^2
+  pr <- residuals(model)/(1 - lm.influence(model)$hat)
+  PRESS <- sum(pr^2)
+  PRESS
 
-#Plot the density functions of run_total against different ou levels
-par(mfrow=c(2,2))
-for( ou in temp_data ){
-  qualified<-subset(data2, total==ou)
-  if( length(qualified$run_total) > 15){
-    plot(density(qualified$run_total), sub=ou)
-  }
+  # anova to calculate residual sum of squares
+  my.anova <- anova(model)
+  tss <- sum(my.anova$"Sum Sq")
+  # predictive R^2
+  pred.r.squared <- 1 - PRESS/(tss)
+  pred.r.squared
 }
-par(mfrow=c(1,1))
 
-
-#the mean run level predicted by ou total
-temp_data <- c()
-mean_runs <- c()
-for( ou in as.data.frame(table(data2$total))$Var1 ){
-  temp_data <- c(temp_data, as.numeric(ou))
-  mean_runs <- c(mean_runs, mean(subset(data2, total==ou)$run_total))
-}
-temp_data
-mean_runs
-#Really high correlation
-plot(temp_data[1:13], mean_runs[1:13])
