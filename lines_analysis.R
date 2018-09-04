@@ -1,7 +1,7 @@
 #Introduction to R
 
 #Set working Directory
-setwd("/Users/emanuelschorsch/Documents/Baseball")
+setwd("Documents/Baseball")
 
 #####Reading Data#####
 data2<-read.csv("processed-blines.csv", header=T)
