@@ -164,7 +164,7 @@ load_function <- function(file="blines.csv"){
 #load database
 library(RMySQL)
 
-mydb <- dbConnect(MySQL(), user='root', password='', dbname='retrosheets', host='localhost')
+mydb <- dbConnect(MySQL(), user='user', password='pw', dbname='retrosheets', host='localhost')
 on.exit(dbDisconnect(mydb))
 #dbListFields(mydb, 'games')
 data2<-load_function("blines.csv")
